@@ -1,0 +1,9 @@
+---
+title: "Homework 3"
+author: Fiona Ehrich
+output: github_document
+---
+
+```{r libraries, message = FALSE, warning = FALSE}
+library(tidyverse)
+```
