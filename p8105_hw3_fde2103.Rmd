@@ -110,3 +110,4 @@ accel =
     )
 ```
 
+The resulting dataset has `r nrow(accel)` rows and `r ncol(accel)` columns. The variables are: `r names(accel)`. This dataset is now tidier than it was originally; each activity observation now exists on its own row.
