@@ -145,9 +145,13 @@ accel %>%
     title = "24-Hour Activity Time Course by Day of the Week (Accelerometer Data)",
     x = "Minute of the Day",
     y = "Activity Count",
-    color = "Day of the Week",
-    caption = "Note: Minute 1 corresponds to midnight."
+    color = "Day of the Week"
+  ) +
+  scale_x_continuous(
+    breaks = c(1, 361, 721, 1081),
+    labels = c("12 am", "6 am", "12 pm", "6 pm")
   )
 ```
 
 From this plot, I can see that activity tends to be lower at night (presumably while the person wearing the accelerometer is resting or sleeping) and higher during the day. I also notice some peaks in activity on Sunday late mornings and on Friday evenings. I think that these peaks could correspond to some of this person's regular, weekly activities (for example, going out on the town on Friday nights!).
+
