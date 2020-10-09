@@ -4,7 +4,7 @@ author: Fiona Ehrich
 output: github_document
 ---
 
-```{r setup, message = FALSE, warning = FALSE}
+```{r setup, include = FALSE}
 library(tidyverse)
 library(p8105.datasets)
 
@@ -135,3 +135,19 @@ accel %>%
   knitr::kable()
 ```
 
+I am now making a plot that shows the 24-hour activity time courses for each day.
+
+```{r}
+accel %>% 
+  ggplot(aes(x = minute, y = activity, color = day)) + 
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "24-Hour Activity Time Course by Day of the Week (Accelerometer Data)",
+    x = "Minute of the Day",
+    y = "Activity Count",
+    color = "Day of the Week",
+    caption = "Note: Minute 1 corresponds to midnight."
+  )
+```
+
+From this plot, I can see that activity tends to be lower at night (presumably while the person wearing the accelerometer is resting or sleeping) and higher during the day. I also notice some peaks in activity on Sunday late mornings and on Friday evenings. I think that these peaks could correspond to some of this person's regular, weekly activities (for example, going out on the town on Friday nights!).
