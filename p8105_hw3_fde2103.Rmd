@@ -80,3 +80,33 @@ instacart %>%
   knitr::kable()
 ```
 
+## Problem 2
+
+Load, tidy, and otherwise wrangle the data.
+
+```{r}
+accel =
+  read_csv(
+    "./data/accel_data.csv",
+    col_types = cols( # I am making sure these variables are in appropriate classes
+      week = col_factor(),
+      day_id = col_factor(),
+      day = col_factor()
+      )
+    ) %>% 
+  janitor::clean_names() %>% 
+  pivot_longer( # Making the dataset more tidy
+    activity_1:activity_1440,
+    names_to = "minute",
+    names_prefix = "activity_",
+    names_transform = list(minute = as.numeric), # Making the minute variable numeric
+    values_to = "activity",
+    ) %>% 
+  mutate(
+    day_type = 
+      as.factor(
+        ifelse(day == c("Saturday", "Sunday"), "weekend", "weekday")
+        )
+    )
+```
+
