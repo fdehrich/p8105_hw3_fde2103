@@ -103,7 +103,8 @@ accel =
     values_to = "activity",
     ) %>% 
   mutate(
-    day_type = 
+    day = forcats::fct_relevel(day,c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")), # Putting the day of the week factors in a sensible order
+    day_type = # Making a new variable to indicate whether weekend or weekday
       as.factor(
         ifelse(day == c("Saturday", "Sunday"), "weekend", "weekday")
         )
@@ -111,3 +112,24 @@ accel =
 ```
 
 The resulting dataset has `r nrow(accel)` rows and `r ncol(accel)` columns. The variables are: `r names(accel)`. This dataset is now tidier than it was originally; each activity observation now exists on its own row.
+
+Now, I will aggregate across minutes to create a total activity for each day. Below is a table that displays the total activity for each day in chronological order (I sorted first by week and then by day of the week).
+
+```{r message = FALSE, warning = FALSE}
+accel %>% 
+  group_by(week, day) %>% 
+  summarize(total_activity = sum(activity)) %>% 
+  arrange(week, day) %>% 
+  knitr::kable()
+```
+
+It is hard to see any particular trends from this table alone. By sorting the table from highest to lowest total activity per day (below), I can see that the maximum total activity per day is 685910 and the minimum total activity per day is 1440 (and I can see how each day ranks in terms of total activity).
+
+```{r message = FALSE, warning = FALSE}
+accel %>% 
+  group_by(week, day) %>% 
+  summarize(total_activity = sum(activity)) %>% 
+  arrange(desc(total_activity)) %>% 
+  knitr::kable()
+```
+
