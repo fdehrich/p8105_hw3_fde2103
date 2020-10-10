@@ -137,7 +137,7 @@ accel %>%
 
 I am now making a plot that shows the 24-hour activity time courses for each day.
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 accel %>% 
   ggplot(aes(x = minute, y = activity, color = day)) + 
   geom_smooth(se = FALSE) +
@@ -154,4 +154,47 @@ accel %>%
 ```
 
 From this plot, I can see that activity tends to be lower at night (presumably while the person wearing the accelerometer is resting or sleeping) and higher during the day. I also notice some peaks in activity on Sunday late mornings and on Friday evenings. I think that these peaks could correspond to some of this person's regular, weekly activities (for example, going out on the town on Friday nights!).
+
+## Problem 3
+
+```{r}
+data("ny_noaa")
+```
+
+This dataset contains `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The variable names are `r names(ny_noaa)`. Essentially, each row contains various weather-related observations for a given weather station on a given day (precipitation, snowfall, snow depth, maximum temperature, minimum temperature). By using the summary function (output below), we can see there is data missing for all five of the weather-related variables.
+
+```{r}
+ny_noaa %>% 
+  mutate( # I am just quickly making tmax and tmin numeric here so that the summary displays properly
+    tmax = as.numeric(tmax),
+    tmin = as.numeric(tmin)
+  ) %>% 
+  summary()
+```
+
+To get arough sense of the extent of this missing data, the following are the proportions of missing data relative to the total number of rows (I evaluated this for each of the weather-related variables): `r sum(is.na(pull(ny_noaa, prcp)))/nrow(ny_noaa)` for precipitation, `r sum(is.na(pull(ny_noaa, snow)))/nrow(ny_noaa)` for snowfall, `r sum(is.na(pull(ny_noaa, snwd)))/nrow(ny_noaa)` for snow depth, `r sum(is.na(pull(ny_noaa, tmax)))/nrow(ny_noaa)` for maximum temperature, and `r sum(is.na(pull(ny_noaa, tmin)))/nrow(ny_noaa)` for minimum temperature. These values confirm that there is quite a bit of missing data in this dataset, particularly for the temperature variables.
+
+Now, I will clean the data. I am splitting up the date variable, making sure variables are in appropriate classes, and converting certain variables to more appropriate units.
+
+```{r}
+ny_noaa_tidy =
+  ny_noaa %>%
+  separate(date, into = c("year", "month", "day"), sep = "-") %>% # Separating the date variable
+   mutate(
+     year = as.integer(year), # Correcting the variable classes
+     month = as.integer(month),
+     day = as.integer(day),
+     tmax = (as.numeric(tmax))/10, # Converting this into degrees C rather than tenths of degrees C
+     tmin = (as.numeric(tmin))/10, # Converting this into degrees C rather than tenths of degrees C
+     prcp = prcp/10 # Converting this into mm rather than tenths of mm
+   )
+```
+
+The table below shows the most commonly observed values. We can see that 0 is the most commonly observed value. This makes sense as snow does not typically occur in NY for a majority of the months.
+
+```{r}
+ny_noaa_tidy %>% 
+  count(snow) %>% 
+  arrange(desc(n))
+```
 
