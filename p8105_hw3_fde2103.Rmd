@@ -106,7 +106,7 @@ accel =
     values_to = "activity",
     ) %>% 
   mutate(
-    day = forcats::fct_relevel(day,c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")), # Putting the day of the week factors in a sensible order
+    day = forcats::fct_relevel(day, c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")), # Putting the day of the week factors in a sensible order
     day_type = # Making a new variable to indicate whether weekend or weekday
       as.factor(
         ifelse(day == c("Saturday", "Sunday"), "weekend", "weekday")
@@ -116,7 +116,7 @@ accel =
 
 The resulting dataset has `r nrow(accel)` rows and `r ncol(accel)` columns. The variables are: `r names(accel)`. This dataset is now tidier than it was originally; each activity observation now exists on its own row.
 
-Now, I will aggregate across minutes to create a total activity for each day. Below is a table that displays the total activity for each day in chronological order (I sorted first by week and then by day of the week). I put this table into a "wider" format so it is easier to read.
+Now, I will aggregate across minutes to create a total activity value for each day. Below is a table that displays the total activity for each day in chronological order (I sorted first by week and then by day of the week). I put this table into a "wider" format so it is easier to read.
 
 ```{r message = FALSE, warning = FALSE}
 accel %>% 
@@ -194,7 +194,7 @@ ny_noaa_tidy =
    )
 ```
 
-The table below shows the most commonly observed values. We can see that 0 is the most commonly observed value. This makes sense as snow does not typically occur in NY for a majority of the months.
+The table below shows the most commonly observed values for snowfall. We can see that 0 is the most commonly observed value. This makes sense as snow does not typically occur in NY for a majority of the months in a given year.
 
 ```{r}
 ny_noaa_tidy %>% 
@@ -223,7 +223,7 @@ ny_noaa_tidy %>%
   )
 ```
 
-Below is a two-panel plot showing (i) `tmax` vs `tmin` for the full dataset and (ii) the distribution of snowfall values greater than 0 and less than 100 separately by year. From the first graphic, it looks like max temperature increases as minimum temperature, which makes sense (eg, during the summer both of these are likely higher and during the winter both of these are likely lower). There also appears to be cluster of more frequent values toward the center of the graphic, which indicate the temperature ranges that most frequently occur in NY. From the second graphic, I was struck by how consistent median snowfall is from year to year. The mean snowfall year to year (denoted by the green dots) varies somewhat, which makes sense as the mean is more sensitive to extreme values.
+Below is a two-panel plot showing (i) `tmax` vs `tmin` for the full dataset and (ii) the distribution of snowfall values greater than 0 and less than 100 separately by year. From the first graphic, it looks like max temperature increases as minimum temperature, which makes sense (eg, during the summer both of these are likely higher and during the winter both of these are likely lower). There also appears to be cluster of more frequent values toward the center of the graphic, which indicates the temperature ranges that most frequently occur in NY. From the second graphic, I was struck by how consistent median snowfall is from year to year. The mean snowfall year to year (denoted by the green dots) varies somewhat, which makes sense as the mean is more sensitive to extreme values.
 
 ```{r message = FALSE, warning = FALSE}
 temp = 
