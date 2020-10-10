@@ -223,7 +223,7 @@ ny_noaa_tidy %>%
   )
 ```
 
-Below is a two-panel plot showing (i) `tmax` vs `tmin` for the full dataset and (ii) the distribution of snowfall values greater than 0 and less than 100 separately by year. From the first graphic, it looks like max temperature increases as minimum temperature, which makes sense (eg, during the summer both of these are likely higher and during the winter both of these are likely lower). There also appears to be cluster of more frequent values toward the center of the graphic, which indicates the temperature ranges that most frequently occur in NY. From the second graphic, I was struck by how consistent median snowfall is from year to year. The mean snowfall year to year (denoted by the green dots) varies somewhat, which makes sense as the mean is more sensitive to extreme values.
+Below is a two-panel plot showing (i) `tmax` vs `tmin` for the full dataset and (ii) the distribution of snowfall values greater than 0 and less than 100 separately by year. From the first graphic, it looks like max temperature increases as minimum temperature, which makes sense (eg, during the summer both of these are likely higher and during the winter both of these are likely lower). There also appears to be cluster of more frequent values toward the center of the graphic, which indicates the temperature ranges that most frequently occur in NY. From the second graphic, I was struck by how consistent median snowfall is from year to year. The mean snowfall year to year (denoted by the pink dots) varies somewhat, which makes sense as the mean is more sensitive to extreme values.
 
 ```{r message = FALSE, warning = FALSE}
 temp = 
@@ -242,7 +242,7 @@ snowfall =
   filter(snow > 0, snow < 100) %>% 
   ggplot(aes(x = year, y = snow)) +
   geom_boxplot() +
-  stat_summary(fun = "mean", color = "green") +
+  stat_summary(fun = "mean", color = "pink") +
   theme(axis.text.x = element_text(angle = 90)) +
   labs(
     title = "Snowfall Values by Year",
