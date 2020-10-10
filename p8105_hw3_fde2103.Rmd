@@ -6,18 +6,17 @@ output: github_document
 
 ```{r setup, include = FALSE}
 library(tidyverse)
+library(patchwork)
+library(hexbin)
 library(p8105.datasets)
 
-knitr::opts_chunk$set(
-	fig.width = 6, 
-  fig.asp = .6,
-  out.width = "90%"
-)
-theme_set(theme_minimal() + theme(legend.position = "bottom"))
+theme_set(theme_minimal())
+
 options(
   ggplot2.continuous.colour = "viridis",
   ggplot2.continuous.fill = "viridis"
 )
+
 scale_colour_discrete = scale_colour_viridis_d
 scale_fill_discrete = scale_fill_viridis_d
 ```
@@ -50,7 +49,11 @@ instacart %>%
 	) %>% 
 	ggplot(aes(x = aisle, y = n)) + 
 	geom_point() + 
-	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+	theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  labs(
+    title = "Number of Items Ordered in Each Aisle",
+    x = "Aisle",
+    y = "Numer of Items Ordered")
 ```
 
 Below is a table showing the three most popular items in each of the aisles "baking ingredients", "dog food care", "packaged vegetables fruits".
@@ -142,7 +145,8 @@ accel %>%
   ggplot(aes(x = minute, y = activity, color = day)) + 
   geom_smooth(se = FALSE) +
   labs(
-    title = "24-Hour Activity Time Course by Day of the Week (Accelerometer Data)",
+    title = "24-Hour Activity Time Course by Day of the Week",
+    caption = "Note: Accelerometer data.",
     x = "Minute of the Day",
     y = "Activity Count",
     color = "Day of the Week"
@@ -172,7 +176,7 @@ ny_noaa %>%
   summary()
 ```
 
-To get arough sense of the extent of this missing data, the following are the proportions of missing data relative to the total number of rows (I evaluated this for each of the weather-related variables): `r sum(is.na(pull(ny_noaa, prcp)))/nrow(ny_noaa)` for precipitation, `r sum(is.na(pull(ny_noaa, snow)))/nrow(ny_noaa)` for snowfall, `r sum(is.na(pull(ny_noaa, snwd)))/nrow(ny_noaa)` for snow depth, `r sum(is.na(pull(ny_noaa, tmax)))/nrow(ny_noaa)` for maximum temperature, and `r sum(is.na(pull(ny_noaa, tmin)))/nrow(ny_noaa)` for minimum temperature. These values confirm that there is quite a bit of missing data in this dataset, particularly for the temperature variables.
+To get a rough sense of the extent of this missing data, the following are the proportions of missing data relative to the total number of rows (I evaluated this for each of the weather-related variables): `r sum(is.na(pull(ny_noaa, prcp)))/nrow(ny_noaa)` for precipitation, `r sum(is.na(pull(ny_noaa, snow)))/nrow(ny_noaa)` for snowfall, `r sum(is.na(pull(ny_noaa, snwd)))/nrow(ny_noaa)` for snow depth, `r sum(is.na(pull(ny_noaa, tmax)))/nrow(ny_noaa)` for maximum temperature, and `r sum(is.na(pull(ny_noaa, tmin)))/nrow(ny_noaa)` for minimum temperature. These values confirm that there is quite a bit of missing data in this dataset, particularly for the temperature variables.
 
 Now, I will clean the data. I am splitting up the date variable, making sure variables are in appropriate classes, and converting certain variables to more appropriate units.
 
@@ -200,7 +204,7 @@ ny_noaa_tidy %>%
 
 Below is a plot showing the average max temperature in January and in July in each station across years. As one would expect, the max temperatures in January tend to be much lower than those in July. From year to year, the January values appear to fluctuate more than the July values, which appear more steady. I do notice some outliers - for example, an unusually high value in the January panel and several unusually low values in the July panel.
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 month_labels = c(`1` = "January", `7` = "July")
 
 ny_noaa_tidy %>% 
@@ -208,13 +212,45 @@ ny_noaa_tidy %>%
   group_by(id, month, year) %>% 
   summarize(mean_tmax = mean(tmax, na.rm = TRUE)) %>% 
   ggplot(aes(x = year, y = mean_tmax)) +
-  geom_point(alpha = .2) +
+  geom_point(alpha = .15) +
   geom_smooth(se = FALSE) +
   facet_grid(. ~ month, labeller = as_labeller(month_labels)) +
+  theme(panel.spacing.x = unit(15, "pt")) +
   labs(
     title = "Average Max Temperatures in January and July Over Time",
     x = "Year",
     y = "Average Max Temperature (C)"
-  ) 
+  )
+```
+
+Below is a two-panel plot showing (i) `tmax` vs `tmin` for the full dataset and (ii) the distribution of snowfall values greater than 0 and less than 100 separately by year. From the first graphic, it looks like max temperature increases as minimum temperature, which makes sense (eg, during the summer both of these are likely higher and during the winter both of these are likely lower). There also appears to be cluster of more frequent values toward the center of the graphic, which indicate the temperature ranges that most frequently occur in NY. From the second graphic, I was struck by how consistent median snowfall is from year to year. The mean snowfall year to year (denoted by the green dots) varies somewhat, which makes sense as the mean is more sensitive to extreme values.
+
+```{r message = FALSE, warning = FALSE}
+temp = 
+  ny_noaa_tidy %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex() +
+  labs(
+    title = "Max Temperatures vs Min Temperatures",
+    x = "Min Temperature (C)",
+    y = "Max Temperature (C)"
+  )
+
+snowfall =
+  ny_noaa_tidy %>%
+  mutate(year = factor(year)) %>% 
+  filter(snow > 0, snow < 100) %>% 
+  ggplot(aes(x = year, y = snow)) +
+  geom_boxplot() +
+  stat_summary(fun = "mean", color = "green") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  labs(
+    title = "Snowfall Values by Year",
+    caption = "Note: Excludes snowfall values less than 0 mm and greater than 100 mm.",
+    x = "Year",
+    y = "Snowfall (mm)"
+    )
+
+temp / snowfall
 ```
 
